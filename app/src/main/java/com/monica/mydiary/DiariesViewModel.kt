@@ -21,9 +21,9 @@ class DiariesViewModel(private val diaryDao: DiaryDao) : ViewModel() {
 
     val diaries: LiveData<List<Diary>> = diaryDao.getDiaries().asLiveData()
 
-    fun saveDiary(text: String): Boolean {
+    fun saveDiary(title:String = "", content: String): Boolean {
         //_draft = text
-        val diary = Diary(0, text, Date())
+        val diary = Diary(0, title, Date(), content)
         viewModelScope.launch {
             diaryDao.insertDiary(diary)
         }

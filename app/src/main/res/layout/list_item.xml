@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="8dp">
@@ -9,21 +11,43 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/item_title"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="16dp"
-            android:textAppearance="?attr/textAppearanceHeadline6" />
+            android:layout_margin="16dp"
+            android:orientation="horizontal">
+            <TextView
+                android:id="@+id/item_title"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="3"
+                android:textAppearance="?attr/textAppearanceHeadline6"
+                android:ellipsize="end"
+                tools:text="Title adsfdsfdsfaffdfddddddddddddddddd"
+                android:maxLines="1"/>
+
+            <TextView
+                android:id="@+id/date"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="end"
+                android:textAppearance="?attr/textAppearanceBodySmall"
+                tools:text="Sep 30 2022" />
+        </LinearLayout>
 
         <TextView
-            android:id="@+id/date"
+            android:id="@+id/content"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:padding="16dp"
-            android:textAppearance="?attr/textAppearanceHeadline6" />
+            android:textAppearance="?attr/textAppearanceBodyMedium"
+            android:maxLines="5"
+            android:ellipsize="end"
+            tools:text="@string/lorem_ipsum"/>
 
         <ImageView
+            android:visibility="gone"
             android:id="@+id/item_image"
             android:layout_width="match_parent"
             android:layout_height="194dp"

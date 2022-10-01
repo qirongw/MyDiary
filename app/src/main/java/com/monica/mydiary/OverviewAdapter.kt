@@ -9,14 +9,18 @@ import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.monica.mydiary.database.Diary
+import java.text.SimpleDateFormat
+import java.util.Date
 
 class OverviewAdapter(private val context: Context): Adapter<OverviewAdapter.MyViewHolder>() {
 
+    private val dateFormatter = SimpleDateFormat("MMM d yyyy")
     private var _diaries: List<Diary> = emptyList()
 
     class MyViewHolder(view: View): ViewHolder(view) {
-        val textView: TextView = view.findViewById(R.id.item_title)
+        val title: TextView = view.findViewById(R.id.item_title)
         val date: TextView = view.findViewById(R.id.date)
+        val content: TextView = view.findViewById(R.id.content)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder {
@@ -27,12 +31,13 @@ class OverviewAdapter(private val context: Context): Adapter<OverviewAdapter.MyV
     }
 
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
-        holder.textView.text = _diaries[position].title
-        holder.date.text = _diaries[position].date.toString()
-        holder.textView.setOnClickListener {
+        holder.title.text = _diaries[position].title
+        holder.content.text = _diaries[position].content
+        holder.date.text = dateFormatter.format(_diaries[position].date)
+        holder.title.setOnClickListener {
             val action = OverviewFragmentDirections
                 .actionOverviewFragmentToDetailFragment(_diaries[position].id)
-            holder.textView.findNavController().navigate(action)
+            holder.title.findNavController().navigate(action)
         }
     }
 

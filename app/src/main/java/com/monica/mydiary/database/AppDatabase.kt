@@ -8,8 +8,11 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 
 @Database(
-    entities = arrayOf(Diary::class),
-    version = 1,
+    entities = [Diary::class],
+    version = 2,
+    autoMigrations = [
+        AutoMigration (from = 1, to = 2)
+    ],
     exportSchema = true)
 @TypeConverters(Converters::class)
 abstract class AppDatabase: RoomDatabase() {

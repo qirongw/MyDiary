@@ -1,6 +1,7 @@
 package com.monica.mydiary.database
 
 import androidx.annotation.NonNull
+import androidx.annotation.Nullable
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
@@ -10,8 +11,10 @@ import java.util.Date
 data class Diary(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
-    @NonNull @ColumnInfo(name = "title")
-    val title: String,
+    @ColumnInfo(name = "title")
+    val title: String="",
     @NonNull @ColumnInfo(name="date")
-    val date:Date
+    val date:Date,
+    @NonNull @ColumnInfo(name="content", defaultValue = "")
+    val content:String
 )

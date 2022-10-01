@@ -96,9 +96,10 @@ class ComposeFragment : Fragment() {
     }
 
     private fun saveDiary() {
-        val text = binding.input.text
-        if (text!= null && text.toString().isNotEmpty()) {
-            if (viewModel.saveDiary(text.toString())) {
+        val text = binding.input.text.toString()
+        val title = binding.title.text.toString()
+        if (text.isNotEmpty()) {
+            if (viewModel.saveDiary(title, text)) {
                 onSaveSucceed()
             } else {
                 onSaveFailed()
