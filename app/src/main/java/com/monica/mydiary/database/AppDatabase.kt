@@ -1,11 +1,17 @@
 package com.monica.mydiary.database
 
 import android.content.Context
+import androidx.room.AutoMigration
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.room.TypeConverters
 
-@Database(entities = arrayOf(Diary::class), version = 1)
+@Database(
+    entities = arrayOf(Diary::class),
+    version = 1,
+    exportSchema = true)
+@TypeConverters(Converters::class)
 abstract class AppDatabase: RoomDatabase() {
 
     companion object {

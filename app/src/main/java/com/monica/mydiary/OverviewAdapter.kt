@@ -16,6 +16,7 @@ class OverviewAdapter(private val context: Context): Adapter<OverviewAdapter.MyV
 
     class MyViewHolder(view: View): ViewHolder(view) {
         val textView: TextView = view.findViewById(R.id.item_title)
+        val date: TextView = view.findViewById(R.id.date)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder {
@@ -27,6 +28,7 @@ class OverviewAdapter(private val context: Context): Adapter<OverviewAdapter.MyV
 
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
         holder.textView.text = _diaries[position].title
+        holder.date.text = _diaries[position].date.toString()
         holder.textView.setOnClickListener {
             val action = OverviewFragmentDirections
                 .actionOverviewFragmentToDetailFragment(_diaries[position].id)

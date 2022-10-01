@@ -10,7 +10,9 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.runBlocking
+import java.util.Date
 
 class DiariesViewModel(private val diaryDao: DiaryDao) : ViewModel() {
 
@@ -21,7 +23,7 @@ class DiariesViewModel(private val diaryDao: DiaryDao) : ViewModel() {
 
     fun saveDiary(text: String): Boolean {
         //_draft = text
-        val diary = Diary(0, text)
+        val diary = Diary(0, text, Date())
         viewModelScope.launch {
             diaryDao.insertDiary(diary)
         }
@@ -37,17 +39,12 @@ class DiariesViewModel(private val diaryDao: DiaryDao) : ViewModel() {
     }
 
     fun getDiary(id: Int): LiveData<Diary> {
-        return diaryDao.getDiary(id).asLiveData()
-    }
-
-    suspend fun testDelete(diary: Diary) {
-        runBlocking { diaryDao.deleteDiary(diary) }
-        delay(3000)
+        return diaryDao.getDiary(id).take(1).asLiveData()
     }
 
     fun deleteDiary(diary: Diary): LiveData<Unit> {
         return flow<Unit> {
-            emit(testDelete(diary))
+            emit(diaryDao.deleteDiary(diary))
         }.asLiveData()
     }
 
