@@ -1,21 +1,29 @@
 package com.monica.mydiary
 
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowManager
 
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updatePadding
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.monica.mydiary.database.Diary
 import com.monica.mydiary.databinding.FragmentComposeBinding
+import java.util.Date
 
 class ComposeFragment : Fragment() {
 
@@ -27,7 +35,19 @@ class ComposeFragment : Fragment() {
     private val binding get() = _binding!!
 
     private var actionMode: ActionMode? = null
+    private val args: ComposeFragmentArgs by navArgs()
+    private val isUpdating get() = args.diaryId != -1
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            activity?.window?.setDecorFitsSystemWindows(false)
+        } else {
+            activity?.window?.setSoftInputMode(
+                WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE
+                or WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE)
+        }
+    }
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -38,8 +58,28 @@ class ComposeFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding.input.setText(viewModel.draft)
-        setupContextualMenu()
+        if (isUpdating) {
+            viewModel.getDiary(args.diaryId).observe(viewLifecycleOwner) {
+                _diary ->
+                    if (_diary != null) {
+                        binding.input.setText(_diary.content)
+                        binding.title.setText(_diary.title)
+                        enableEditingActionMode()
+                    }
+            }
+        } else {
+            binding.input.setText(viewModel.draft)
+            setupContextualMenu()
+        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT_WATCH) {
+            ViewCompat.setOnApplyWindowInsetsListener(view) {
+                v, insets ->
+                v.updatePadding(bottom = insets.getInsets(WindowInsetsCompat.Type.ime()).bottom)
+                // Return the insets so that they keep going down the view hierarchy
+                insets
+            }
+        }
     }
 
     override fun onDestroyView() {
@@ -77,7 +117,11 @@ class ComposeFragment : Fragment() {
             override fun onActionItemClicked(mode: ActionMode?, menuItem: MenuItem?): Boolean {
                 return when (menuItem?.itemId) {
                     R.id.save -> {
-                        saveDiary()
+                        if (isUpdating) {
+                            updateDiary()
+                        } else {
+                            saveDiary()
+                        }
                         return true
                     }
                     else -> false
@@ -85,7 +129,9 @@ class ComposeFragment : Fragment() {
             }
 
             override fun onDestroyActionMode(p0: ActionMode?) {
-                if (!binding.input.text.isNullOrEmpty()) {
+                if (isUpdating) {
+                    findNavController().navigate(R.id.action_ComposeFragment_OverviewFragment)
+                } else if (!binding.input.text.isNullOrEmpty()) {
                     confirmToSaveDraft()
                 }
                 actionMode = null
@@ -93,6 +139,15 @@ class ComposeFragment : Fragment() {
         }
         actionMode = (requireActivity() as AppCompatActivity)
             .startSupportActionMode(callback)
+    }
+
+    private fun updateDiary() {
+        val text = binding.input.text.toString()
+        val title = binding.title.text.toString()
+        val diary = Diary(args.diaryId, title, Date(), text)
+        viewModel.updateDiary(diary).observe(viewLifecycleOwner) {
+            actionMode?.finish()
+        }
     }
 
     private fun saveDiary() {

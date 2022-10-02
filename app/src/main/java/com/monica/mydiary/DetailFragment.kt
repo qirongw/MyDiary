@@ -10,6 +10,7 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.activityViewModels
@@ -49,7 +50,9 @@ class DetailFragment : Fragment() {
             if (_diary != null) {
                 diary = _diary
                 binding.loading.visibility = View.GONE
-                binding.textviewSecond.text = diary.title
+                binding.detailContent.text = diary.content
+                binding.date.text = OverviewAdapter.dateFormatter.format(diary.date)
+                (activity as AppCompatActivity).supportActionBar?.title = diary.title
                 setupMenu()
             }
         }
@@ -72,11 +75,20 @@ class DetailFragment : Fragment() {
                         deleteDiary()
                         true
                     }
+                    R.id.edit -> {
+                        editDiary()
+                        true
+                    }
                     else -> false
                 }
             }
 
         }, viewLifecycleOwner)
+    }
+
+    private fun editDiary() {
+        val action = DetailFragmentDirections.actionDetailFragmentToComposeFragment(diary.id)
+        findNavController().navigate(action)
     }
 
     private fun deleteDiary() {

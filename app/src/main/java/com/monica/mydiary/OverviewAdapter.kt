@@ -14,7 +14,10 @@ import java.util.Date
 
 class OverviewAdapter(private val context: Context): Adapter<OverviewAdapter.MyViewHolder>() {
 
-    private val dateFormatter = SimpleDateFormat("MMM d yyyy")
+    companion object {
+        val dateFormatter = SimpleDateFormat("MMM d yyyy")
+    }
+
     private var _diaries: List<Diary> = emptyList()
 
     class MyViewHolder(view: View): ViewHolder(view) {
@@ -34,7 +37,7 @@ class OverviewAdapter(private val context: Context): Adapter<OverviewAdapter.MyV
         holder.title.text = _diaries[position].title
         holder.content.text = _diaries[position].content
         holder.date.text = dateFormatter.format(_diaries[position].date)
-        holder.title.setOnClickListener {
+        holder.itemView.setOnClickListener {
             val action = OverviewFragmentDirections
                 .actionOverviewFragmentToDetailFragment(_diaries[position].id)
             holder.title.findNavController().navigate(action)

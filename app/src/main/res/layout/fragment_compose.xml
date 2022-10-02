@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
     <EditText
@@ -17,8 +16,10 @@
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1">
+        android:layout_height="wrap_content"
+        android:id="@+id/scrollview"
+        android:layout_above="@id/image"
+        android:layout_below="@id/title">
 
         <EditText
             android:id="@+id/input"
@@ -31,9 +32,11 @@
     </androidx.core.widget.NestedScrollView>
 
     <Button
+        android:id="@+id/image"
         android:layout_margin="20dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="image"
-        />
-</LinearLayout>
+        android:layout_alignParentBottom="true"
+        android:text="image" />
+</RelativeLayout>
+

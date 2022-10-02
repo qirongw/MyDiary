@@ -30,6 +30,12 @@ class DiariesViewModel(private val diaryDao: DiaryDao) : ViewModel() {
         return true
     }
 
+    fun updateDiary(diary: Diary): LiveData<Unit> {
+        return flow {
+            emit(diaryDao.updateDiary(diary))
+        }.asLiveData()
+    }
+
     fun saveDraft(text: String) {
         _draft = text
     }
