@@ -5,7 +5,7 @@
 
     <item android:id="@+id/edit"
         android:title="Edit"
-        android:icon="@drawable/ic_edit_48dp"
+        android:icon="@drawable/ic_edit_24dp"
         app:showAsAction="ifRoom"/>
 
     <item android:id="@+id/delete"
