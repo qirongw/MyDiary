@@ -20,6 +20,8 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import androidx.navigation.ui.AppBarConfiguration
+import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.monica.mydiary.database.Diary
 import com.monica.mydiary.databinding.FragmentComposeBinding
@@ -38,16 +40,6 @@ class ComposeFragment : Fragment() {
     private val args: ComposeFragmentArgs by navArgs()
     private val isUpdating get() = args.diaryId != -1
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            activity?.window?.setDecorFitsSystemWindows(false)
-        } else {
-            activity?.window?.setSoftInputMode(
-                WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE
-                or WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE)
-        }
-    }
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -58,6 +50,11 @@ class ComposeFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        val navController = findNavController()
+        val appBarConfiguration = AppBarConfiguration(navController.graph)
+        binding.toolbar.setupWithNavController(navController, appBarConfiguration)
+
         if (isUpdating) {
             viewModel.getDiary(args.diaryId).observe(viewLifecycleOwner) {
                 _diary ->
@@ -72,6 +69,7 @@ class ComposeFragment : Fragment() {
             setupContextualMenu()
         }
 
+        /*
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT_WATCH) {
             ViewCompat.setOnApplyWindowInsetsListener(view) {
                 v, insets ->
@@ -79,7 +77,7 @@ class ComposeFragment : Fragment() {
                 // Return the insets so that they keep going down the view hierarchy
                 insets
             }
-        }
+        }*/
     }
 
     override fun onDestroyView() {

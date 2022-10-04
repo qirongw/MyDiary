@@ -16,6 +16,8 @@ import androidx.core.view.MenuProvider
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import androidx.navigation.ui.AppBarConfiguration
+import androidx.navigation.ui.setupWithNavController
 import com.monica.mydiary.database.Diary
 import com.monica.mydiary.databinding.FragmentDetailBinding
 
@@ -45,6 +47,7 @@ class DetailFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.loading.visibility = View.VISIBLE
+        //(requireActivity() as AppCompatActivity).setSupportActionBar(binding.toolbar)
         viewModel.getDiary(args.diaryId).observe(viewLifecycleOwner) {
             _diary ->
             if (_diary != null) {
@@ -52,8 +55,24 @@ class DetailFragment : Fragment() {
                 binding.loading.visibility = View.GONE
                 binding.detailContent.text = diary.content
                 binding.date.text = OverviewAdapter.dateFormatter.format(diary.date)
-                (activity as AppCompatActivity).supportActionBar?.title = diary.title
-                setupMenu()
+                binding.toolbar.inflateMenu(R.menu.menu_detail)
+                binding.toolbar.title = diary.title
+                val navController = findNavController()
+                val appBarConfiguration = AppBarConfiguration(navController.graph)
+                binding.toolbar.setupWithNavController(navController, appBarConfiguration)
+                binding.toolbar.setOnMenuItemClickListener {
+                    when(it.itemId) {
+                        R.id.delete -> {
+                            deleteDiary()
+                            true
+                        }
+                        R.id.edit -> {
+                            editDiary()
+                            true
+                        }
+                        else -> false
+                    }
+                }
             }
         }
     }
@@ -61,29 +80,6 @@ class DetailFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
-    }
-
-    private fun setupMenu() {
-        (requireActivity() as MenuHost).addMenuProvider(object : MenuProvider {
-            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
-                menuInflater.inflate(R.menu.menu_detail, menu)
-            }
-
-            override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
-                return when(menuItem.itemId) {
-                    R.id.delete -> {
-                        deleteDiary()
-                        true
-                    }
-                    R.id.edit -> {
-                        editDiary()
-                        true
-                    }
-                    else -> false
-                }
-            }
-
-        }, viewLifecycleOwner)
     }
 
     private fun editDiary() {

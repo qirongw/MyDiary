@@ -1,12 +1,17 @@
 package com.monica.mydiary
 
+import android.content.Context
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.findNavController
+import androidx.navigation.fragment.findNavController
+import androidx.navigation.ui.AppBarConfiguration
+import androidx.navigation.ui.setupWithNavController
 import androidx.recyclerview.widget.RecyclerView
 import com.monica.mydiary.databinding.FragmentOverviewBinding
 
@@ -43,10 +48,16 @@ class OverviewFragment : Fragment() {
             }
         recyclerView.adapter = adapter
 
-        binding.fab.setOnClickListener { view ->
-            view.findNavController().navigate(R.id.action_global_composeFragment)
+        binding.fab.setOnClickListener { _ ->
+            findNavController().navigate(R.id.action_global_composeFragment)
         }
+
+        binding.toolbar.inflateMenu(R.menu.menu_main)
+        val navController = findNavController()
+        val appBarConfiguration = AppBarConfiguration(navController.graph)
+        binding.toolbar.setupWithNavController(navController, appBarConfiguration)
     }
+
 
     override fun onDestroyView() {
         super.onDestroyView()

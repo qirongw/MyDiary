@@ -5,14 +5,23 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
+
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:layout_alignParentTop="true"
+        style="@style/Widget.MaterialComponents.Toolbar.Primary"/>
+
     <EditText
         android:id="@+id/title"
-        android:textAppearance="@style/TextAppearance.Material3.DisplaySmall"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_below="@id/toolbar"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
-        android:hint="Title" />
+        android:hint="Title"
+        android:textAppearance="@style/TextAppearance.Material3.DisplaySmall" />
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
@@ -39,4 +48,5 @@
         android:layout_alignParentBottom="true"
         android:text="image" />
 </RelativeLayout>
+
 
