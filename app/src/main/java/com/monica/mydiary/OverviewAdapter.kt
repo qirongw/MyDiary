@@ -4,6 +4,7 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView.Adapter
@@ -24,6 +25,7 @@ class OverviewAdapter(private val context: Context): Adapter<OverviewAdapter.MyV
         val title: TextView = view.findViewById(R.id.item_title)
         val date: TextView = view.findViewById(R.id.date)
         val content: TextView = view.findViewById(R.id.content)
+        val image: ImageView = view.findViewById(R.id.item_image)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder {
