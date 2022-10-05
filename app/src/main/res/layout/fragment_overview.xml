@@ -8,14 +8,16 @@
     tools:context=".OverviewFragment">
 
     <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appbar"
+        android:background="?attr/colorPrimary"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        app:liftOnScroll="true">
 
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        app:layout_scrollFlags="scroll|enterAlways|snap"
         style="@style/Widget.MaterialComponents.Toolbar.Primary"/>
 
     </com.google.android.material.appbar.AppBarLayout>

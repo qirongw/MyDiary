@@ -13,6 +13,9 @@ import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updatePadding
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
@@ -46,6 +49,12 @@ class DetailFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        ViewCompat.setOnApplyWindowInsetsListener(binding.appbar) { view, windowInsets ->
+            val insets = windowInsets.getInsets(WindowInsetsCompat.Type.statusBars())
+            view.updatePadding(top = insets.top)
+            windowInsets
+        }
+
         binding.loading.visibility = View.VISIBLE
         //(requireActivity() as AppCompatActivity).setSupportActionBar(binding.toolbar)
         viewModel.getDiary(args.diaryId).observe(viewLifecycleOwner) {

@@ -43,6 +43,12 @@ class OverviewFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        ViewCompat.setOnApplyWindowInsetsListener(binding.appbar) { view, windowInsets ->
+            val insets = windowInsets.getInsets(WindowInsetsCompat.Type.statusBars())
+            view.updatePadding(top = insets.top)
+            windowInsets
+        }
+
         recyclerView = binding.recyclerView
         val adapter = OverviewAdapter(requireContext())
         viewModel.diaries.observe(viewLifecycleOwner)

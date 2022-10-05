@@ -51,6 +51,13 @@ class ComposeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        /*
+        ViewCompat.setOnApplyWindowInsetsListener(binding.appbar) { view, windowInsets ->
+            val insets = windowInsets.getInsets(WindowInsetsCompat.Type.statusBars())
+            view.updatePadding(top = insets.top)
+            windowInsets
+        }*/
+
         val navController = findNavController()
         val appBarConfiguration = AppBarConfiguration(navController.graph)
         binding.toolbar.setupWithNavController(navController, appBarConfiguration)
@@ -69,15 +76,17 @@ class ComposeFragment : Fragment() {
             setupContextualMenu()
         }
 
-        /*
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT_WATCH) {
             ViewCompat.setOnApplyWindowInsetsListener(view) {
                 v, insets ->
-                v.updatePadding(bottom = insets.getInsets(WindowInsetsCompat.Type.ime()).bottom)
+                v.updatePadding(
+                    top = insets.getInsets(WindowInsetsCompat.Type.statusBars()).top,
+                    bottom = insets.getInsets(WindowInsetsCompat.Type.ime()).bottom)
+
                 // Return the insets so that they keep going down the view hierarchy
                 insets
             }
-        }*/
+        }
     }
 
     override fun onDestroyView() {

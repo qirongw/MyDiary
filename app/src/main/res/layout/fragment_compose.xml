@@ -6,18 +6,24 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.google.android.material.appbar.MaterialToolbar
-        android:id="@+id/toolbar"
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appbar"
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:layout_alignParentTop="true"
-        style="@style/Widget.MaterialComponents.Toolbar.Surface"/>
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true">
+
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            style="@style/Widget.MaterialComponents.Toolbar.Surface"/>
+    </com.google.android.material.appbar.AppBarLayout>
 
     <EditText
         android:id="@+id/title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/toolbar"
+        android:layout_below="@id/appbar"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
         android:hint="Title"
@@ -44,6 +50,7 @@
         android:id="@+id/image"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_margin="@dimen/content_padding"
         android:layout_alignParentBottom="true"
         style="@style/Widget.App.Button.IconOnly"
         app:icon="@drawable/ic_image_48dp"
