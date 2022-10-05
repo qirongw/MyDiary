@@ -1,5 +1,6 @@
 package com.monica.mydiary.database
 
+import android.net.Uri
 import androidx.annotation.NonNull
 import androidx.annotation.Nullable
 import androidx.room.ColumnInfo
@@ -16,5 +17,7 @@ data class Diary(
     @NonNull @ColumnInfo(name="date")
     val date:Date,
     @NonNull @ColumnInfo(name="content", defaultValue = "")
-    val content:String
+    val content:String,
+    @ColumnInfo(name="photoUri", defaultValue = "")
+    val photoUri:Uri?
 )

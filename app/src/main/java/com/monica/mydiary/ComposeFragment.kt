@@ -1,5 +1,6 @@
 package com.monica.mydiary
 
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -41,6 +42,7 @@ class ComposeFragment : Fragment() {
     private var actionMode: ActionMode? = null
     private val args: ComposeFragmentArgs by navArgs()
     private val isUpdating get() = args.diaryId != -1
+    private var imageUri: Uri? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -61,7 +63,8 @@ class ComposeFragment : Fragment() {
         }
         viewModel.photoUri.observe(viewLifecycleOwner) {_uri ->
             binding.photo.visibility = View.VISIBLE
-            binding.photo.setImageURI(_uri)
+            imageUri = _uri
+            binding.photo.setImageURI(imageUri)
         }
 
         if (isUpdating) {
@@ -159,12 +162,13 @@ class ComposeFragment : Fragment() {
 
     private fun clearImage() {
         viewModel.removeSelectedPhotoUri()
+        imageUri = null
     }
 
     private fun updateDiary() {
         val text = binding.input.text.toString()
         val title = binding.title.text.toString()
-        val diary = Diary(args.diaryId, title, Date(), text)
+        val diary = Diary(args.diaryId, title, Date(), text, imageUri)
         viewModel.updateDiary(diary).observe(viewLifecycleOwner) {
             actionMode?.finish()
         }
@@ -174,7 +178,7 @@ class ComposeFragment : Fragment() {
         val text = binding.input.text.toString()
         val title = binding.title.text.toString()
         if (text.isNotEmpty()) {
-            if (viewModel.saveDiary(title, text)) {
+            if (viewModel.saveDiary(title, imageUri, text)) {
                 onSaveSucceed()
             } else {
                 onSaveFailed()

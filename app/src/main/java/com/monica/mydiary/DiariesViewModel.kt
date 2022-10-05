@@ -33,9 +33,8 @@ class DiariesViewModel(private val diaryDao: DiaryDao) : ViewModel() {
         _photoUri = MutableLiveData()
     }
 
-    fun saveDiary(title:String = "", content: String): Boolean {
-        //_draft = text
-        val diary = Diary(0, title, Date(), content)
+    fun saveDiary(title:String = "", photoUri: Uri? = null, content: String): Boolean {
+        val diary = Diary(0, title, Date(), content, photoUri)
         viewModelScope.launch {
             diaryDao.insertDiary(diary)
         }
