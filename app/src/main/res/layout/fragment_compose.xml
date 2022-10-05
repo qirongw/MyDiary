@@ -11,7 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:layout_alignParentTop="true"
-        style="@style/Widget.MaterialComponents.Toolbar.Primary"/>
+        style="@style/Widget.MaterialComponents.Toolbar.Surface"/>
 
     <EditText
         android:id="@+id/title"
@@ -42,11 +42,13 @@
 
     <Button
         android:id="@+id/image"
-        android:layout_margin="20dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:text="image" />
+        style="@style/Widget.App.Button.IconOnly"
+        app:icon="@drawable/ic_image_48dp"
+        app:iconPadding="0dp"
+        app:iconSize="30dp"/>
 </RelativeLayout>
 
 
