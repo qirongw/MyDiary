@@ -1,5 +1,6 @@
 package com.monica.mydiary
 
+import android.net.Uri
 import androidx.lifecycle.*
 import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
 import androidx.lifecycle.viewmodel.CreationExtras
@@ -20,6 +21,17 @@ class DiariesViewModel(private val diaryDao: DiaryDao) : ViewModel() {
     val draft: String get() = _draft
 
     val diaries: LiveData<List<Diary>> = diaryDao.getDiaries().asLiveData()
+
+    private var _photoUri = MutableLiveData<Uri>()
+    val photoUri: LiveData<Uri> get() = _photoUri
+
+    fun setSelectedPhotoUri(uri: Uri) {
+        _photoUri.value = uri
+    }
+
+    fun removeSelectedPhotoUri() {
+        _photoUri = MutableLiveData()
+    }
 
     fun saveDiary(title:String = "", content: String): Boolean {
         //_draft = text

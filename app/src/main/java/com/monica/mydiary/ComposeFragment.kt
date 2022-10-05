@@ -10,6 +10,8 @@ import android.view.ViewGroup
 import android.view.WindowManager
 
 import android.widget.Toast
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
 import androidx.core.view.ViewCompat
@@ -51,16 +53,16 @@ class ComposeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        /*
-        ViewCompat.setOnApplyWindowInsetsListener(binding.appbar) { view, windowInsets ->
-            val insets = windowInsets.getInsets(WindowInsetsCompat.Type.statusBars())
-            view.updatePadding(top = insets.top)
-            windowInsets
-        }*/
-
         val navController = findNavController()
         val appBarConfiguration = AppBarConfiguration(navController.graph)
         binding.toolbar.setupWithNavController(navController, appBarConfiguration)
+        binding.addPhoto.setOnClickListener {
+            selectPhoto()
+        }
+        viewModel.photoUri.observe(viewLifecycleOwner) {_uri ->
+            binding.photo.visibility = View.VISIBLE
+            binding.photo.setImageURI(_uri)
+        }
 
         if (isUpdating) {
             viewModel.getDiary(args.diaryId).observe(viewLifecycleOwner) {
@@ -91,7 +93,14 @@ class ComposeFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
+        clearImage()
         _binding = null
+    }
+
+    private fun selectPhoto() {
+        (requireActivity() as MainActivity).pickMedia.launch(
+            PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+        )
     }
 
     private fun setupContextualMenu() {
@@ -146,6 +155,10 @@ class ComposeFragment : Fragment() {
         }
         actionMode = (requireActivity() as AppCompatActivity)
             .startSupportActionMode(callback)
+    }
+
+    private fun clearImage() {
+        viewModel.removeSelectedPhotoUri()
     }
 
     private fun updateDiary() {
