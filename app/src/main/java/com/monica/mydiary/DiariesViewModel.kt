@@ -33,12 +33,11 @@ class DiariesViewModel(private val diaryDao: DiaryDao) : ViewModel() {
         _photoUri = MutableLiveData()
     }
 
-    fun saveDiary(title:String = "", photoUri: Uri? = null, content: String): Boolean {
+    fun saveDiary(title:String = "", photoUri: Uri? = null, content: String): LiveData<Unit> {
         val diary = Diary(0, title, Date(), content, photoUri)
-        viewModelScope.launch {
-            diaryDao.insertDiary(diary)
-        }
-        return true
+        return flow {
+            emit(diaryDao.insertDiary(diary))
+        }.asLiveData()
     }
 
     fun updateDiary(diary: Diary): LiveData<Unit> {

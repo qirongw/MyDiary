@@ -19,58 +19,77 @@
             style="@style/Widget.MaterialComponents.Toolbar.Surface"/>
     </com.google.android.material.appbar.AppBarLayout>
 
-    <EditText
-        android:id="@+id/title"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+    <FrameLayout
         android:layout_below="@id/appbar"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
-        android:hint="Title"
-        android:textAppearance="@style/TextAppearance.Material3.DisplaySmall" />
-
-    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/scrollview"
-        android:layout_above="@id/image_group"
-        android:layout_below="@id/title">
-
-        <EditText
-            android:id="@+id/input"
-            android:textAppearance="@style/TextAppearance.Material3.HeadlineMedium"
+        android:layout_height="wrap_content">
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="20dp"
-            android:hint="What's on your mind?"
-            android:background="@null"/>
+            android:layout_height="wrap_content">
+            <EditText
+                android:id="@+id/title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                android:hint="Title"
+                android:textAppearance="@style/TextAppearance.Material3.DisplaySmall" />
+            <androidx.core.widget.NestedScrollView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/scrollview"
+                android:layout_above="@id/image_group"
+                android:layout_below="@id/title">
 
-    </androidx.core.widget.NestedScrollView>
+                <EditText
+                    android:id="@+id/input"
+                    android:textAppearance="@style/TextAppearance.Material3.HeadlineMedium"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="20dp"
+                    android:hint="What's on your mind?"
+                    android:background="@null"/>
+            </androidx.core.widget.NestedScrollView>
+            <LinearLayout
+                android:id="@+id/image_group"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:orientation="vertical"
+                android:layout_marginStart="@dimen/content_padding"
+                android:layout_marginTop="@dimen/content_padding"
+                android:layout_marginEnd="@dimen/content_padding"
+                android:layout_marginBottom="@dimen/content_padding">
+                <ImageView
+                    android:id="@+id/photo"
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:visibility="gone"/>
+                <Button
+                    android:id="@+id/add_photo"
+                    style="@style/Widget.App.Button.IconOnly"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:icon="@drawable/ic_image_48dp"
+                    app:iconPadding="0dp"
+                    app:iconSize="30dp" />
+            </LinearLayout>
+        </RelativeLayout>
 
-    <LinearLayout
-        android:id="@+id/image_group"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:orientation="vertical"
-        android:layout_marginStart="@dimen/content_padding"
-        android:layout_marginTop="@dimen/content_padding"
-        android:layout_marginEnd="@dimen/content_padding"
-        android:layout_marginBottom="@dimen/content_padding">
-        <ImageView
-            android:id="@+id/photo"
-            android:layout_width="100dp"
-            android:layout_height="100dp"
-            android:visibility="gone"/>
-        <Button
-            android:id="@+id/add_photo"
-            style="@style/Widget.App.Button.IconOnly"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:icon="@drawable/ic_image_48dp"
-            app:iconPadding="0dp"
-            app:iconSize="30dp" />
-    </LinearLayout>
+        <FrameLayout
+            android:id="@+id/loading"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="?attr/colorSurface"
+            android:visibility="gone">
+
+            <com.google.android.material.progressindicator.CircularProgressIndicator
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:indeterminate="true" />
+        </FrameLayout>
+    </FrameLayout>
 
 </RelativeLayout>
 

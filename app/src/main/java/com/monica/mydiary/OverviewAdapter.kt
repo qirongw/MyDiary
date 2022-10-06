@@ -39,6 +39,7 @@ class OverviewAdapter(private val context: Context): Adapter<OverviewAdapter.MyV
         holder.title.text = _diaries[position].title
         holder.content.text = _diaries[position].content
         holder.date.text = dateFormatter.format(_diaries[position].date)
+
         holder.itemView.setOnClickListener {
             val action = OverviewFragmentDirections
                 .actionOverviewFragmentToDetailFragment(_diaries[position].id)

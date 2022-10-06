@@ -9,7 +9,6 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
 
 import android.widget.Toast
@@ -17,7 +16,6 @@ import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
-import androidx.core.content.ContextCompat.getSystemService
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updatePadding
@@ -44,7 +42,8 @@ class ComposeFragment : Fragment() {
 
     private var actionMode: ActionMode? = null
     private val args: ComposeFragmentArgs by navArgs()
-    private val isUpdating get() = args.diaryId != -1
+    private val inUpdateMode get() = args.diaryId != -1
+    private var isSaving = false
     private var imageUri: Uri? = null
 
     override fun onCreateView(
@@ -71,7 +70,7 @@ class ComposeFragment : Fragment() {
             binding.photo.setImageURI(imageUri)
         }
 
-        if (isUpdating) {
+        if (inUpdateMode) {
             viewModel.getDiary(args.diaryId).observe(viewLifecycleOwner) {
                 _diary ->
                     if (_diary != null) {
@@ -148,7 +147,7 @@ class ComposeFragment : Fragment() {
             override fun onActionItemClicked(mode: ActionMode?, menuItem: MenuItem?): Boolean {
                 return when (menuItem?.itemId) {
                     R.id.save -> {
-                        if (isUpdating) {
+                        if (inUpdateMode) {
                             updateDiary()
                         } else {
                             saveDiary()
@@ -160,16 +159,20 @@ class ComposeFragment : Fragment() {
             }
 
             override fun onDestroyActionMode(p0: ActionMode?) {
-                if (isUpdating) {
-                    findNavController().navigate(R.id.action_ComposeFragment_OverviewFragment)
-                } else if (!binding.input.text.isNullOrEmpty()) {
+                if (shouldConfirmToSaveDraft()) {
                     confirmToSaveDraft()
+                } else if (inUpdateMode) {
+                    findNavController().navigate(R.id.action_ComposeFragment_OverviewFragment)
                 }
                 actionMode = null
             }
         }
         actionMode = (requireActivity() as AppCompatActivity)
             .startSupportActionMode(callback)
+    }
+
+    private fun shouldConfirmToSaveDraft(): Boolean {
+        return !inUpdateMode && !isSaving && !binding.input.text.isNullOrEmpty()
     }
 
     private fun clearImage() {
@@ -181,19 +184,22 @@ class ComposeFragment : Fragment() {
         val text = binding.input.text.toString()
         val title = binding.title.text.toString()
         val diary = Diary(args.diaryId, title, Date(), text, imageUri)
+        binding.loading.visibility = View.VISIBLE
         viewModel.updateDiary(diary).observe(viewLifecycleOwner) {
             actionMode?.finish()
         }
     }
 
     private fun saveDiary() {
+        isSaving = true
+        actionMode?.finish()
         val text = binding.input.text.toString()
         val title = binding.title.text.toString()
-        if (text.isNotEmpty()) {
-            if (viewModel.saveDiary(title, imageUri, text)) {
+        if (text.isNotEmpty() or title.isNotEmpty()) {
+            binding.loading.visibility = View.VISIBLE
+            viewModel.saveDiary(title, imageUri, text).observe(viewLifecycleOwner) {
                 onSaveSucceed()
-            } else {
-                onSaveFailed()
+                isSaving = false
             }
         }
     }
