@@ -1,9 +1,12 @@
 package com.monica.mydiary
 
 import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.drawable.BitmapDrawable
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.provider.MediaStore
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
@@ -16,12 +19,15 @@ import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
+import androidx.core.graphics.drawable.toBitmap
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updatePadding
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.asLiveData
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.navigation.ui.AppBarConfiguration
@@ -29,9 +35,18 @@ import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.monica.mydiary.database.Diary
 import com.monica.mydiary.databinding.FragmentComposeBinding
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
+import java.io.ByteArrayOutputStream
+import java.io.File
 import java.util.Date
 
 class ComposeFragment : Fragment() {
+
+    companion object {
+        val FILE_PREFIX = "diary_image_"
+        val FILE_SUFFIX = ".jpg"
+    }
 
     private val viewModel: DiariesViewModel by activityViewModels { DiariesViewModel.Factory }
     private var _binding: FragmentComposeBinding? = null
@@ -197,11 +212,36 @@ class ComposeFragment : Fragment() {
         val title = binding.title.text.toString()
         if (text.isNotEmpty() or title.isNotEmpty()) {
             binding.loading.visibility = View.VISIBLE
-            viewModel.saveDiary(title, imageUri, text).observe(viewLifecycleOwner) {
+            //viewModel.saveDiary(title, imageUri, text).observe(viewLifecycleOwner) {
+            flow {
+                emit(saveDiaryWithImage(title, text))
+            }.asLiveData().observe(viewLifecycleOwner) {
                 onSaveSucceed()
                 isSaving = false
             }
+
         }
+    }
+
+    private suspend fun saveDiaryWithImage(title: String, content:String) {
+        var imageFilename:String? = null
+        if (imageUri != null) {
+            imageFilename = saveImageToFile()
+        }
+        viewModel.saveDiary(title, imageUri, content)
+    }
+
+    fun saveImageToFile(): String {
+        val bitmap = (binding.photo.drawable as BitmapDrawable).bitmap
+        val byteArrayOutputStream = ByteArrayOutputStream()
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 0, byteArrayOutputStream)
+        val data = byteArrayOutputStream.toByteArray()
+
+        val filename = FILE_PREFIX + System.currentTimeMillis().toString() + FILE_SUFFIX
+        requireContext().openFileOutput(filename, Context.MODE_PRIVATE).use {
+            it.write(data)
+        }
+        return filename
     }
 
     private fun confirmToSaveDraft() {
@@ -236,6 +276,4 @@ class ComposeFragment : Fragment() {
         findNavController().navigate(R.id.action_ComposeFragment_OverviewFragment)
         Toast.makeText(requireContext(), "Diary Saved Successfully!", Toast.LENGTH_SHORT).show()
     }
-
-    private fun onSaveFailed() {}
 }
