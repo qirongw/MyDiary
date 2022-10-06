@@ -18,6 +18,6 @@ data class Diary(
     val date:Date,
     @NonNull @ColumnInfo(name="content", defaultValue = "")
     val content:String,
-    @ColumnInfo(name="photoUri", defaultValue = "")
+    @ColumnInfo(name="photoUri")
     val photoUri:Uri?
 )
