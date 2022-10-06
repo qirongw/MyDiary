@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "4c5e3b82b60ce3d80fdc0b16ce4e7c96",
+    "identityHash": "54ad4ac6d24ab8afcfec4425685799d3",
     "entities": [
       {
         "tableName": "Diary",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `title` TEXT NOT NULL, `date` INTEGER NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `title` TEXT NOT NULL, `date` INTEGER NOT NULL, `content` TEXT NOT NULL DEFAULT '', `photoFilename` TEXT)",
         "fields": [
           {
             "fieldPath": "id",
@@ -25,6 +25,19 @@
             "columnName": "date",
             "affinity": "INTEGER",
             "notNull": true
+          },
+          {
+            "fieldPath": "content",
+            "columnName": "content",
+            "affinity": "TEXT",
+            "notNull": true,
+            "defaultValue": "''"
+          },
+          {
+            "fieldPath": "photoFilename",
+            "columnName": "photoFilename",
+            "affinity": "TEXT",
+            "notNull": false
           }
         ],
         "primaryKey": {
@@ -40,7 +53,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '4c5e3b82b60ce3d80fdc0b16ce4e7c96')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '54ad4ac6d24ab8afcfec4425685799d3')"
     ]
   }
 }
