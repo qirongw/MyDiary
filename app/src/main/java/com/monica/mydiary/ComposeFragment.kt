@@ -37,16 +37,12 @@ import com.monica.mydiary.database.Diary
 import com.monica.mydiary.databinding.FragmentComposeBinding
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.runBlocking
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.util.Date
 
 class ComposeFragment : Fragment() {
-
-    companion object {
-        val FILE_PREFIX = "diary_image_"
-        val FILE_SUFFIX = ".jpg"
-    }
 
     private val viewModel: DiariesViewModel by activityViewModels { DiariesViewModel.Factory }
     private var _binding: FragmentComposeBinding? = null
@@ -198,7 +194,8 @@ class ComposeFragment : Fragment() {
     private fun updateDiary() {
         val text = binding.input.text.toString()
         val title = binding.title.text.toString()
-        val diary = Diary(args.diaryId, title, Date(), text, imageUri)
+        //TODO
+        val diary = Diary(args.diaryId, title, Date(), text, null)
         binding.loading.visibility = View.VISIBLE
         viewModel.updateDiary(diary).observe(viewLifecycleOwner) {
             actionMode?.finish()
@@ -213,35 +210,19 @@ class ComposeFragment : Fragment() {
         if (text.isNotEmpty() or title.isNotEmpty()) {
             binding.loading.visibility = View.VISIBLE
             //viewModel.saveDiary(title, imageUri, text).observe(viewLifecycleOwner) {
-            flow {
-                emit(saveDiaryWithImage(title, text))
-            }.asLiveData().observe(viewLifecycleOwner) {
+            saveDiary(title, text).observe(viewLifecycleOwner) {
                 onSaveSucceed()
                 isSaving = false
             }
 
         }
     }
-
-    private suspend fun saveDiaryWithImage(title: String, content:String) {
-        var imageFilename:String? = null
+    private fun saveDiary(title: String, content:String): LiveData<Unit> {
         if (imageUri != null) {
-            imageFilename = saveImageToFile()
+            val bitmap = (binding.photo.drawable as BitmapDrawable).bitmap
+            return viewModel.saveDiaryWithImage(title, content, bitmap)
         }
-        viewModel.saveDiary(title, imageUri, content)
-    }
-
-    fun saveImageToFile(): String {
-        val bitmap = (binding.photo.drawable as BitmapDrawable).bitmap
-        val byteArrayOutputStream = ByteArrayOutputStream()
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 0, byteArrayOutputStream)
-        val data = byteArrayOutputStream.toByteArray()
-
-        val filename = FILE_PREFIX + System.currentTimeMillis().toString() + FILE_SUFFIX
-        requireContext().openFileOutput(filename, Context.MODE_PRIVATE).use {
-            it.write(data)
-        }
-        return filename
+        return viewModel.saveDiary(title, content)
     }
 
     private fun confirmToSaveDraft() {
