@@ -1,5 +1,6 @@
 package com.monica.mydiary
 
+import android.app.Application
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.drawable.BitmapDrawable
@@ -22,7 +23,7 @@ import java.io.ByteArrayOutputStream
 import java.io.File
 import java.util.Date
 
-class DiariesViewModel(private val context: Context, private val diaryDao: DiaryDao) : ViewModel() {
+class DiariesViewModel(private val context: Application, private val diaryDao: DiaryDao) : ViewModel() {
 
     private var _draft = ""
     val draft: String get() = _draft
@@ -105,7 +106,7 @@ class DiariesViewModel(private val context: Context, private val diaryDao: Diary
                 // Create a SavedStateHandle for this ViewModel from extras
 
                 return DiariesViewModel(
-                    application.applicationContext,
+                    application,
                     (application as MyDiaryApplication).database.diaryDao()
                 ) as T
             }
