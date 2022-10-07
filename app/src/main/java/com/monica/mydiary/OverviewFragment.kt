@@ -62,9 +62,10 @@ class OverviewFragment : Fragment() {
         }
 
         binding.toolbar.inflateMenu(R.menu.menu_main)
-        val navController = findNavController()
-        val appBarConfiguration = AppBarConfiguration(navController.graph)
-        binding.toolbar.setupWithNavController(navController, appBarConfiguration)
+        //val navController = findNavController()
+        //val appBarConfiguration = AppBarConfiguration(navController.graph)
+        //binding.toolbar.setupWithNavController(navController, appBarConfiguration)
+        binding.toolbar.title = "My Diaries"
     }
 
 
