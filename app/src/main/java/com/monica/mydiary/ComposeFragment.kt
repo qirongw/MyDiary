@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.drawable.BitmapDrawable
 import android.net.Uri
+import android.opengl.Visibility
 import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
@@ -67,7 +68,6 @@ class ComposeFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         showSoftKeyboard(binding.input)
         val navController = findNavController()
         val appBarConfiguration = AppBarConfiguration(navController.graph)
@@ -84,11 +84,15 @@ class ComposeFragment : Fragment() {
         if (inUpdateMode) {
             viewModel.getDiary(args.diaryId).observe(viewLifecycleOwner) {
                 _diary ->
-                    if (_diary != null) {
-                        binding.input.setText(_diary.content)
-                        binding.title.setText(_diary.title)
-                        enableEditingActionMode()
+                    binding.input.setText(_diary.content)
+                    binding.title.setText(_diary.title)
+                    viewModel.getImageFromDiary(_diary).observe(viewLifecycleOwner) { _bitmap ->
+                        if (_bitmap != null) {
+                            binding.photo.setImageBitmap(_bitmap)
+                            binding.photo.visibility = View.VISIBLE
+                        }
                     }
+                    enableEditingActionMode()
             }
         } else {
             binding.input.setText(viewModel.draft)
@@ -194,14 +198,10 @@ class ComposeFragment : Fragment() {
     private fun updateDiary() {
         val text = binding.input.text.toString()
         val title = binding.title.text.toString()
-        //TODO
         val diary = Diary(args.diaryId, title, Date(), text, null)
         binding.loading.visibility = View.VISIBLE
 
-        var bitmap:Bitmap? = null
-        if (imageUri != null) {
-            bitmap = (binding.photo.drawable as BitmapDrawable).bitmap
-        }
+        var bitmap = (binding.photo.drawable as BitmapDrawable).bitmap
         viewModel.updateDiary(diary, bitmap).observe(viewLifecycleOwner) {
             actionMode?.finish()
         }
