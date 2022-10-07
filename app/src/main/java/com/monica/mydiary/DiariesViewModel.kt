@@ -3,8 +3,10 @@ package com.monica.mydiary
 import android.app.Application
 import android.content.Context
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.drawable.BitmapDrawable
 import android.net.Uri
+import android.util.Log
 import androidx.lifecycle.*
 import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
 import androidx.lifecycle.viewmodel.CreationExtras
@@ -19,6 +21,7 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
+import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.util.Date
@@ -59,7 +62,7 @@ class DiariesViewModel(private val context: Application, private val diaryDao: D
     private suspend fun saveImageToFile(bitmap: Bitmap): String = coroutineScope {
         withContext(Dispatchers.IO) {
             val byteArrayOutputStream = ByteArrayOutputStream()
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 0, byteArrayOutputStream)
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 10, byteArrayOutputStream)
             val data = byteArrayOutputStream.toByteArray()
 
             val filename = FILE_PREFIX + System.currentTimeMillis().toString() + FILE_SUFFIX
@@ -71,9 +74,37 @@ class DiariesViewModel(private val context: Application, private val diaryDao: D
         }
     }
 
-    fun updateDiary(diary: Diary): LiveData<Unit> {
+    fun getImageFromDiary(diary: Diary): LiveData<Bitmap?> {
+        val res = MutableLiveData<Bitmap?>()
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                val filename = diary.photoFilename
+                if (filename == null) {
+                    res.postValue(null)
+                } else {
+                    val input = context.openFileInput(filename)
+                    val bitmap = BitmapFactory.decodeStream(input)
+                    res.postValue(bitmap)
+                }
+            }
+        }
+        return res
+    }
+
+    fun updateDiary(diary: Diary, bitmap: Bitmap?=null): LiveData<Unit> {
         return flow {
-            emit(diaryDao.updateDiary(diary))
+            if (bitmap != null) {
+                val filename = saveImageToFile(bitmap)
+                val updatedDiary = Diary(
+                    id = diary.id,
+                    title = diary.title,
+                    content = diary.content,
+                    date = diary.date,
+                    photoFilename = filename)
+                emit(diaryDao.updateDiary(updatedDiary))
+            } else {
+                emit(diaryDao.updateDiary(diary))
+            }
         }.asLiveData()
     }
 

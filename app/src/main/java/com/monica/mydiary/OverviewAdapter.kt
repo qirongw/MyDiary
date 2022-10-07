@@ -6,14 +6,17 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.monica.mydiary.database.Diary
 import java.text.SimpleDateFormat
-import java.util.Date
 
-class OverviewAdapter(private val context: Context): Adapter<OverviewAdapter.MyViewHolder>() {
+class OverviewAdapter(private val context: Context,
+                      private val viewModel: DiariesViewModel,
+                    private val lifecycleOwner: LifecycleOwner): Adapter<OverviewAdapter.MyViewHolder>() {
 
     companion object {
         val dateFormatter = SimpleDateFormat("MMM d yyyy")
@@ -44,6 +47,15 @@ class OverviewAdapter(private val context: Context): Adapter<OverviewAdapter.MyV
             val action = OverviewFragmentDirections
                 .actionOverviewFragmentToDetailFragment(_diaries[position].id)
             holder.title.findNavController().navigate(action)
+        }
+
+        viewModel.getImageFromDiary(_diaries[position]).observe(lifecycleOwner) {_bitmap ->
+            if (_bitmap != null) {
+                holder.image.setImageBitmap(_bitmap)
+                holder.image.visibility = View.VISIBLE
+            } else {
+                holder.image.visibility = View.GONE
+            }
         }
     }
 

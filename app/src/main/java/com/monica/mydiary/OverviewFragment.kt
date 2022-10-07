@@ -50,7 +50,7 @@ class OverviewFragment : Fragment() {
         }
 
         recyclerView = binding.recyclerView
-        val adapter = OverviewAdapter(requireContext())
+        val adapter = OverviewAdapter(requireContext(), viewModel, viewLifecycleOwner)
         viewModel.diaries.observe(viewLifecycleOwner)
             {
                 diaries -> adapter.setData(diaries)

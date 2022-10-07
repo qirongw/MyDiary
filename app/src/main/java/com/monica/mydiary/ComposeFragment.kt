@@ -197,7 +197,12 @@ class ComposeFragment : Fragment() {
         //TODO
         val diary = Diary(args.diaryId, title, Date(), text, null)
         binding.loading.visibility = View.VISIBLE
-        viewModel.updateDiary(diary).observe(viewLifecycleOwner) {
+
+        var bitmap:Bitmap? = null
+        if (imageUri != null) {
+            bitmap = (binding.photo.drawable as BitmapDrawable).bitmap
+        }
+        viewModel.updateDiary(diary, bitmap).observe(viewLifecycleOwner) {
             actionMode?.finish()
         }
     }
@@ -209,7 +214,6 @@ class ComposeFragment : Fragment() {
         val title = binding.title.text.toString()
         if (text.isNotEmpty() or title.isNotEmpty()) {
             binding.loading.visibility = View.VISIBLE
-            //viewModel.saveDiary(title, imageUri, text).observe(viewLifecycleOwner) {
             saveDiary(title, text).observe(viewLifecycleOwner) {
                 onSaveSucceed()
                 isSaving = false
