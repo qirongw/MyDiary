@@ -53,6 +53,10 @@
                     android:layout_height="wrap_content"
                     android:textAppearance="@style/TextAppearance.Material3.HeadlineMedium"
                     tools:text="@string/lorem_ipsum" />
+                <ImageView
+                    android:id="@+id/image"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
             </LinearLayout>
 
         </androidx.core.widget.NestedScrollView>

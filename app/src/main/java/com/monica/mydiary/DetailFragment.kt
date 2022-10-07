@@ -62,10 +62,8 @@ class DetailFragment : Fragment() {
             if (_diary != null) {
                 diary = _diary
                 binding.loading.visibility = View.GONE
-                binding.detailContent.text = diary.content
-                binding.date.text = OverviewAdapter.dateFormatter.format(diary.date)
+
                 binding.toolbar.inflateMenu(R.menu.menu_detail)
-                binding.toolbar.title = diary.title
                 val navController = findNavController()
                 val appBarConfiguration = AppBarConfiguration(navController.graph)
                 binding.toolbar.setupWithNavController(navController, appBarConfiguration)
@@ -81,6 +79,13 @@ class DetailFragment : Fragment() {
                         }
                         else -> false
                     }
+                }
+
+                binding.detailContent.text = diary.content
+                binding.date.text = OverviewAdapter.dateFormatter.format(diary.date)
+                binding.toolbar.title = diary.title
+                viewModel.getImageFromDiary(diary).observe(viewLifecycleOwner) {_bitmap ->
+                    binding.image.setImageBitmap(_bitmap)
                 }
             }
         }
