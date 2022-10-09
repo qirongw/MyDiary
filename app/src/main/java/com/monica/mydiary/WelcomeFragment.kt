@@ -1,19 +1,29 @@
 package com.monica.mydiary
 
+import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
-import androidx.fragment.app.Fragment
+import android.provider.Settings
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.navigation.NavDestination
+import android.widget.Toast
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.biometric.BiometricManager
+import androidx.biometric.BiometricManager.Authenticators.BIOMETRIC_STRONG
+import androidx.biometric.BiometricManager.Authenticators.DEVICE_CREDENTIAL
+import androidx.biometric.BiometricManager.BIOMETRIC_ERROR_HW_UNAVAILABLE
+import androidx.biometric.BiometricManager.BIOMETRIC_ERROR_NONE_ENROLLED
+import androidx.biometric.BiometricManager.BIOMETRIC_ERROR_NO_HARDWARE
+import androidx.biometric.BiometricManager.BIOMETRIC_SUCCESS
+import androidx.biometric.BiometricPrompt
+import androidx.core.content.ContextCompat
+import androidx.fragment.app.Fragment
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
 import com.monica.mydiary.databinding.FragmentWelcomeBinding
-
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
 
 /**
  * A simple [Fragment] subclass.
@@ -25,9 +35,22 @@ class WelcomeFragment : Fragment() {
     private var _binding: FragmentWelcomeBinding? = null
     private val binding get() = _binding!!
 
+    private val enrollIntent = Intent(Settings.ACTION_BIOMETRIC_ENROLL).apply {
+        putExtra(
+            Settings.EXTRA_BIOMETRIC_AUTHENTICATORS_ALLOWED,
+            BIOMETRIC_STRONG or DEVICE_CREDENTIAL)
+    }
+    private lateinit var launchEnroll: ActivityResultLauncher<Intent>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        launchEnroll = registerForActivityResult (ActivityResultContracts.StartActivityForResult()) {
+                result ->
+            //if (result.resultCode == Activity.RESULT_OK) {
+            Log.i("WelcomeFragment", "on enroll activity result: " + result.resultCode)
+            //}
+        }
     }
 
     override fun onCreateView(
@@ -41,32 +64,70 @@ class WelcomeFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding.lock.setOnClickListener {
-            val navOptions: NavOptions? = NavOptions.Builder()
-                .setPopUpTo(R.id.welcomeFragment, true).build()
 
-            findNavController().navigate(
-                R.id.action_welcomeFragment_to_OverviewFragment, null, navOptions)
+        val executor = ContextCompat.getMainExecutor(requireContext())
+        val biometricPrompt = BiometricPrompt(this, executor,
+            object : BiometricPrompt.AuthenticationCallback() {
+                override fun onAuthenticationError(errorCode: Int,
+                                                   errString: CharSequence) {
+                    super.onAuthenticationError(errorCode, errString)
+                    Toast.makeText(requireContext(),
+                        "Authentication error: $errString", Toast.LENGTH_SHORT)
+                        .show()
+                }
+
+                override fun onAuthenticationSucceeded(
+                    result: BiometricPrompt.AuthenticationResult) {
+                    super.onAuthenticationSucceeded(result)
+
+                    val navOptions: NavOptions? = NavOptions.Builder()
+                        .setPopUpTo(R.id.welcomeFragment, true).build()
+
+                    findNavController().navigate(
+                        R.id.action_welcomeFragment_to_OverviewFragment, null, navOptions)
+
+                }
+
+                override fun onAuthenticationFailed() {
+                    super.onAuthenticationFailed()
+                    Toast.makeText(requireContext(), "Authentication failed",
+                        Toast.LENGTH_SHORT)
+                        .show()
+                }
+            })
+
+        val promptInfo = BiometricPrompt.PromptInfo.Builder()
+            .setTitle("Biometric login for my diary")
+            .setSubtitle("Log in using your biometric credential")
+            .setAllowedAuthenticators(BIOMETRIC_STRONG or DEVICE_CREDENTIAL)
+            .build()
+
+        binding.lock.setOnClickListener {
+            if (checkAuthAvailable()) {
+                biometricPrompt.authenticate(promptInfo)
+            }
         }
     }
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment WelcomeFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            WelcomeFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
-                }
+    private fun checkAuthAvailable(): Boolean {
+        val biometricManager = BiometricManager.from(requireContext())
+        return when(biometricManager.canAuthenticate(BIOMETRIC_STRONG or DEVICE_CREDENTIAL)) {
+            BIOMETRIC_SUCCESS ->
+                true
+
+            BIOMETRIC_ERROR_NO_HARDWARE ->
+                false
+
+            BIOMETRIC_ERROR_HW_UNAVAILABLE ->
+                false
+
+            BIOMETRIC_ERROR_NONE_ENROLLED -> {
+                // Prompts the user to create credentials that your app accepts.
+                launchEnroll.launch(enrollIntent)
+                false
             }
+
+            else -> false
+        }
     }
 }
