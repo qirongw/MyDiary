@@ -45,6 +45,13 @@ class WelcomeFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        if (BuildConfig.DEBUG) {
+            val navOptions: NavOptions? = NavOptions.Builder()
+                .setPopUpTo(R.id.welcomeFragment, true).build()
+            findNavController().navigate(
+                R.id.action_welcomeFragment_to_OverviewFragment, null, navOptions)
+        }
+
         launchEnroll = registerForActivityResult (ActivityResultContracts.StartActivityForResult()) {
                 result ->
             //if (result.resultCode == Activity.RESULT_OK) {
@@ -82,7 +89,6 @@ class WelcomeFragment : Fragment() {
 
                     val navOptions: NavOptions? = NavOptions.Builder()
                         .setPopUpTo(R.id.welcomeFragment, true).build()
-
                     findNavController().navigate(
                         R.id.action_welcomeFragment_to_OverviewFragment, null, navOptions)
 

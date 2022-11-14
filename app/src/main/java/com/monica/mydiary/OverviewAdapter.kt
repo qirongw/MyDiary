@@ -1,6 +1,7 @@
 package com.monica.mydiary
 
 import android.content.Context
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,7 +12,9 @@ import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
+import com.bumptech.glide.Glide
 import com.monica.mydiary.database.Diary
+import java.io.File
 import java.text.SimpleDateFormat
 
 class OverviewAdapter(private val context: Context,
@@ -49,13 +52,22 @@ class OverviewAdapter(private val context: Context,
             holder.title.findNavController().navigate(action)
         }
 
-        viewModel.getImageFromDiary(_diaries[position]).observe(lifecycleOwner) {_bitmap ->
-            if (_bitmap != null) {
-                holder.image.setImageBitmap(_bitmap)
+        if (_diaries[position].photoFilename != null) {
+            val imageFile = File(context.filesDir, _diaries[position].photoFilename)
+            if (imageFile.exists()) {
                 holder.image.visibility = View.VISIBLE
+                Glide.with(context)
+                    .load(imageFile)
+                    //.load("https://images.app.goo.gl/RsDrunMyKU4pdorJ8")
+                    .centerCrop()
+                    .into(holder.image)
+
             } else {
-                holder.image.visibility = View.GONE
+                Log.e("OverviewAdapter",
+                    "Unable to find image file with name: " + _diaries[position].photoFilename)
             }
+        } else {
+            holder.image.visibility = View.GONE
         }
     }
 
